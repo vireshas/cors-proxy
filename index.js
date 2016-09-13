@@ -1,9 +1,9 @@
 'use strict';
-const http = require('http');
-const url = require('url');
-const marked = require('marked');
-const request = require('request');
-const readFile = require('fs').readFile;
+var http = require('http');
+var url = require('url');
+var marked = require('marked');
+var request = require('request');
+var readFile = require('fs').readFile;
 
 var server = http.createServer(function (req, resp) {
   var headers = {};
@@ -16,8 +16,8 @@ var server = http.createServer(function (req, resp) {
   headers["Access-Control-Allow-Headers"] = "X-Requested-With, Access-Control-Allow-Origin, X-HTTP-Method-Override, Content-Type, Authorization, Accept";
 
   if (req.url === '/' || req.url === '/favicon.ico') {
-    readFile('./README.md', {encoding: 'utf-8'}, (err, readmeStr) => {
-      marked(readmeStr, (err, content) => {
+    readFile('./README.md', {encoding: 'utf-8'}, function(err, readmeStr) {
+      marked(readmeStr, function(err, content) {
         if (err) {
           resp.end(JSON.stringify({ error: 'You shouldnt be reaching here!'}));
         }
@@ -28,14 +28,16 @@ var server = http.createServer(function (req, resp) {
     });
   } else {
 
-    let urlRegex = new RegExp(regex, 'i');
-    let urlToHit = req.url.replace('/','');
+    var urlRegex = new RegExp(regex, 'i');
+    var urlToHit = req.url.replace('/','');
+    urlToHit = urlToHit.replace( /https?\:\/\/?/g, 'https://' );
 
     if ( !urlRegex.test(urlToHit) ) {
       resp.writeHead(403, {});
-      resp.end(JSON.stringify({ error: `Invalid URL: ${urlToHit}`}));
+      resp.end(JSON.stringify({ error: "Invalid URL: " + urlToHit}));
     }
 
+    console.log("URL: " + urlToHit)
     request(
       {
         url: urlToHit,
@@ -47,11 +49,10 @@ var server = http.createServer(function (req, resp) {
         if (error) {
           if (response) {
             resp.writeHead(response.statusCode, response.headers);
-            resp.end(JSON.stringify({ error: error}));
           } else {
             resp.writeHead(500, {});
-            resp.end(JSON.stringify({ error: `Invalid response: Error ${error}`}));
           }
+          resp.end(JSON.stringify({ error: "" + error}));
         }
       }
     ).pipe(resp);
