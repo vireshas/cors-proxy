@@ -47,15 +47,14 @@ var server = http.createServer(function (req, resp) {
       },
       function (error, response, body) {
         if (error) {
-          if (response) {
-            resp.writeHead(response.statusCode, response.headers);
-          } else {
-            resp.writeHead(500, {});
-          }
+          resp.writeHead(500, "error", {});
           resp.end(JSON.stringify({ error: "" + error}));
         }
       }
-    ).pipe(resp);
+    ).on('response', function(response) {
+      resp.writeHead(200, headers)
+    }).pipe(resp)
+
   }
 });
 
