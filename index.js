@@ -5,11 +5,14 @@ var marked = require('marked');
 var request = require('request');
 var readFile = require('fs').readFile;
 
+var regex = '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})';
+var domain = process.env.DOMAIN || "*";
+var subDomainRegex = new RegExp("https?:\/\/(www.)?([^\.]*)." + domain, "i");
+var domainRegex = new RegExp("https?:\/\/(www.)?" + domain, "i");
+
 var server = http.createServer(function (req, resp) {
   var headers = {};
-  var regex = '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})';
 
-  headers["Access-Control-Allow-Origin"] = "*";
   headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
   headers["Access-Control-Allow-Credentials"] = true;
   headers["Access-Control-Max-Age"] = '86400';
@@ -28,6 +31,20 @@ var server = http.createServer(function (req, resp) {
     });
   } else {
 
+	 	var referer = req.headers.referer;
+
+		if (domain != "*") {
+			var sub = subDomainRegex.exec(referer)
+			if (sub) {
+  			headers["Access-Control-Allow-Origin"] = sub[0];
+			} else {
+				var dom = domainRegex.exec(referer)
+				headers["Access-Control-Allow-Origin"] = dom[0];
+			}
+		} else {
+			headers["Access-Control-Allow-Origin"] = domain;
+		}
+
     var urlRegex = new RegExp(regex, 'i');
     var urlToHit = req.url.replace('/','');
     urlToHit = urlToHit.replace( /https?\:\/\/?/g, 'https://' );
@@ -37,7 +54,7 @@ var server = http.createServer(function (req, resp) {
       resp.end(JSON.stringify({ error: "Invalid URL: " + urlToHit}));
     }
 
-    console.log("URL: " + urlToHit)
+    console.log("URL: " + urlToHit);
     request(
       {
         url: urlToHit,
@@ -47,18 +64,18 @@ var server = http.createServer(function (req, resp) {
       },
       function (error, response, body) {
         if (error) {
-          resp.writeHead(500, "error", {});
-          resp.end(JSON.stringify({ error: "" + error}));
+					console.log("error: " + error)
         }
       }
-    ).on('response', function(response) {
+    ).on('error', function(response) {
+      resp.writeHead(500, "Internal server error", {})
+    }).on('response', function(response) {
       resp.writeHead(200, headers)
     }).pipe(resp)
-
   }
 });
 
 var port = process.env.PORT || 3000;
 server.listen(port, function() {
-    console.log("Server running at http://127.0.0.1/ on port " + port);
+	console.log("Server running at http://127.0.0.1/ on port " + port + " domain " + domain);
 });
