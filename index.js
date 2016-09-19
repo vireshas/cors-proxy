@@ -27,22 +27,36 @@ var server = http.createServer(function (req, resp) {
         headers['Content-Type'] = 'text/html';
         resp.writeHead(200, headers);
         resp.end(content);
+
       });
     });
+
   } else {
+
+    // CORS Preflight
+    if (req.method === 'OPTIONS') {
+      resp.writeHead(200, headers);
+      resp.send();
+      return;
+
+    }
 
 	 	var referer = req.headers.referer;
 
 		if (domain != "*") {
-			var sub = subDomainRegex.exec(referer)
+
+			var sub = subDomainRegex.exec(referer);
 			if (sub) {
   			headers["Access-Control-Allow-Origin"] = sub[0];
+
 			} else {
 				var dom = domainRegex.exec(referer)
 				headers["Access-Control-Allow-Origin"] = dom[0];
+
 			}
 		} else {
 			headers["Access-Control-Allow-Origin"] = domain;
+
 		}
 
     var urlRegex = new RegExp(regex, 'i');
@@ -52,6 +66,7 @@ var server = http.createServer(function (req, resp) {
     if ( !urlRegex.test(urlToHit) ) {
       resp.writeHead(403, {});
       resp.end(JSON.stringify({ error: "Invalid URL: " + urlToHit}));
+
     }
 
     console.log("URL: " + urlToHit);
@@ -65,12 +80,16 @@ var server = http.createServer(function (req, resp) {
       function (error, response, body) {
         if (error) {
 					console.log("error: " + error)
+
         }
       }
+
     ).on('error', function(response) {
       resp.writeHead(500, "Internal server error", {})
+
     }).on('response', function(response) {
       resp.writeHead(200, headers)
+
     }).pipe(resp)
   }
 });
