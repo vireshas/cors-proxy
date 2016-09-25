@@ -1,26 +1,13 @@
 {
   "name": "cors-proxy",
-  "private": false,
   "version": "1.0.0",
   "description": "reverse proxy with CORS headers",
   "license": "MIT",
-  "repository": "vireshas/cors-proxy",
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "scripts": {
-    "start": "node index.js"
-  },
-  "files": [
-    "index.js",
-    "readme.md"
-  ],
   "keywords": [
     "CORS",
     "CORS-PROXY"
   ],
   "dependencies": {
-    "marked": "^0.3.6",
     "request": "^2.74.0"
   }
 }
