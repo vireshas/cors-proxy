@@ -61,7 +61,10 @@ var server = http.createServer(function (req, resp) {
 
     var urlRegex = new RegExp(regex, 'i');
     var urlToHit = req.url.replace('/','');
-    urlToHit = urlToHit.replace( /https?\:\/\/?/g, 'https://' );
+
+    //we https:/ or http:/ here. Gsub it to https:// or http://
+    urlToHit = urlToHit.replace( /https\:\/\/?/g, 'https://' );
+    urlToHit = urlToHit.replace( /http\:\/\/?/g, 'http://' );
 
     if ( !urlRegex.test(urlToHit) ) {
       resp.writeHead(403, {});
