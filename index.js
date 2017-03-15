@@ -41,23 +41,19 @@ var server = http.createServer(function (req, resp) {
 
     }
 
-	 	var referer = req.headers.referer;
+    var referer = req.headers.referer;
 
-		if (domain != "*") {
-
-			var sub = subDomainRegex.exec(referer);
-			if (sub) {
-  			headers["Access-Control-Allow-Origin"] = sub[0];
-
-			} else {
-				var dom = domainRegex.exec(referer)
-				headers["Access-Control-Allow-Origin"] = dom[0];
-
-			}
-		} else {
-			headers["Access-Control-Allow-Origin"] = domain;
-
-		}
+    if (domain != "*") {
+      var sub = subDomainRegex.exec(referer);
+      if (sub) {
+        headers["Access-Control-Allow-Origin"] = sub[0];
+      } else {
+         var dom = domainRegex.exec(referer)
+		 headers["Access-Control-Allow-Origin"] = dom[0];
+	  }
+    } else {
+      headers["Access-Control-Allow-Origin"] = domain;
+    }
 
     var urlRegex = new RegExp(regex, 'i');
     var urlToHit = req.url.replace('/','');
@@ -82,8 +78,7 @@ var server = http.createServer(function (req, resp) {
       },
       function (error, response, body) {
         if (error) {
-					console.log("error: " + error)
-
+          console.log("error: " + error)
         }
       }
 
