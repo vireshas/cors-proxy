@@ -49,8 +49,8 @@ var server = http.createServer(function (req, resp) {
         headers["Access-Control-Allow-Origin"] = sub[0];
       } else {
          var dom = domainRegex.exec(referer)
-		 headers["Access-Control-Allow-Origin"] = dom[0];
-	  }
+         headers["Access-Control-Allow-Origin"] = dom[0];
+      }
     } else {
       headers["Access-Control-Allow-Origin"] = domain;
     }
