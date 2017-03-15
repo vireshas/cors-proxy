@@ -94,5 +94,5 @@ var server = http.createServer(function (req, resp) {
 
 var port = process.env.PORT || 3000;
 server.listen(port, function() {
-	console.log("Server running at http://127.0.0.1/ on port " + port + " domain " + domain);
+  console.log("Server running at http://127.0.0.1/ on port " + port + " domain " + domain);
 });
